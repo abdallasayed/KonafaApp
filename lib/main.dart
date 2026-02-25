@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'screens/main_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,53 +28,12 @@ class KonafaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'كنافه بالقشطه',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFE65100)), // لون برتقالي داكن عصري
+        scaffoldBackgroundColor: Colors.grey[50], // خلفية مريحة للعين
         useMaterial3: true,
+        fontFamily: 'Cairo', // يفضل إضافة خط عربي لاحقاً
       ),
-      home: const CategoriesScreen(),
-    );
-  }
-}
-
-class CategoriesScreen extends StatelessWidget {
-  const CategoriesScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('قائمة كنافه بالقشطه', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.orangeAccent,
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('categories').snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return const Center(child: Text('لا توجد أقسام حالياً'));
-          }
-
-          final categories = snapshot.data!.docs;
-
-          return ListView.builder(
-            itemCount: categories.length,
-            itemBuilder: (context, index) {
-              var category = categories[index].data() as Map<String, dynamic>;
-              return Card(
-                margin: const EdgeInsets.all(10),
-                child: ListTile(
-                  title: Text(category['name'] ?? 'بدون اسم', style: const TextStyle(fontSize: 20)),
-                  subtitle: Text(category['isActive'] == true ? 'متاح' : 'غير متاح'),
-                  trailing: const Icon(Icons.arrow_forward_ios, color: Colors.orange),
-                ),
-              );
-            },
-          );
-        },
-      ),
+      home: const MainScreen(),
     );
   }
 }
