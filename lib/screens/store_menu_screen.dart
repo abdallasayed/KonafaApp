@@ -29,7 +29,6 @@ class _StoreMenuScreenState extends State<StoreMenuScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // شريط الأقسام الخاص بهذا المتجر
           SizedBox(
             height: 60,
             child: StreamBuilder<QuerySnapshot>(
@@ -65,8 +64,6 @@ class _StoreMenuScreenState extends State<StoreMenuScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          
-          // عرض منتجات القسم المختار في هذا المتجر
           Expanded(
             child: selectedCategoryId.isEmpty
                 ? const Center(child: Text('اختر قسماً لعرض المنتجات'))

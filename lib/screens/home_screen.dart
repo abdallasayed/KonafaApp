@@ -23,7 +23,6 @@ class HomeScreen extends StatelessWidget {
           ),
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              // جلب المتاجر النشطة فقط
               stream: FirebaseFirestore.instance.collection('stores').where('isActive', isEqualTo: true).snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
@@ -40,7 +39,6 @@ class HomeScreen extends StatelessWidget {
 
                     return GestureDetector(
                       onTap: () {
-                        // الانتقال لشاشة منيو المتجر
                         Navigator.push(context, MaterialPageRoute(
                           builder: (context) => StoreMenuScreen(storeId: storeId, storeName: store['storeName']),
                         ));
@@ -75,7 +73,8 @@ class HomeScreen extends StatelessWidget {
                                   style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
                                 ),
                               ),
-                              const Icon(Icons.arrow_forward_ios, color: Colors.white),
+                              const Icon(Icons
+.arrow_forward_ios, color: Colors.white),
                               const SizedBox(width: 16),
                             ],
                           ),
