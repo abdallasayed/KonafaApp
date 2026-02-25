@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/cart_provider.dart';
 import 'home_screen.dart';
+import 'cart_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -11,11 +14,10 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  // قائمة الشاشات (سنضيف السلة والعروض لاحقاً)
   final List<Widget> _screens = [
     const HomeScreen(),
     const Center(child: Text('شاشة العروض قريباً')),
-    const Center(child: Text('شاشة السلة قريباً')),
+    const CartScreen(),
     const Center(child: Text('حسابي')),
   ];
 
@@ -31,11 +33,21 @@ class _MainScreenState extends State<MainScreen> {
           });
         },
         indicatorColor: Colors.orange.shade200,
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home, color: Colors.deepOrange), label: 'الرئيسية'),
-          NavigationDestination(icon: Icon(Icons.local_offer_outlined), selectedIcon: Icon(Icons.local_offer, color: Colors.deepOrange), label: 'العروض'),
-          NavigationDestination(icon: Icon(Icons.shopping_cart_outlined), selectedIcon: Icon(Icons.shopping_cart, color: Colors.deepOrange), label: 'السلة'),
-          NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person, color: Colors.deepOrange), label: 'حسابي'),
+        destinations: [
+          const NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home, color: Colors.deepOrange), label: 'الرئيسية'),
+          const NavigationDestination(icon: Icon(Icons.local_offer_outlined), selectedIcon: Icon(Icons.local_offer, color: Colors.deepOrange), label: 'العروض'),
+          NavigationDestination(
+            icon: Consumer<CartProvider>(
+              builder: (_, cart, ch) => Badge(
+                label: Text(cart.itemCount.toString()),
+                isLabelVisible: cart.itemCount > 0,
+                child: const Icon(Icons.shopping_cart_outlined),
+              ),
+            ),
+            selectedIcon: const Icon(Icons.shopping_cart, color: Colors.deepOrange),
+            label: 'السلة',
+          ),
+          const NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person, color: Colors.deepOrange), label: 'حسابي'),
         ],
       ),
     );

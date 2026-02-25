@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'providers/cart_provider.dart';
 import 'screens/main_screen.dart';
 
 void main() async {
@@ -24,16 +26,19 @@ class KonafaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'كنافه بالقشطه',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFE65100)), // لون برتقالي داكن عصري
-        scaffoldBackgroundColor: Colors.grey[50], // خلفية مريحة للعين
-        useMaterial3: true,
-        fontFamily: 'Cairo', // يفضل إضافة خط عربي لاحقاً
+    return ChangeNotifierProvider(
+      create: (context) => CartProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'كنافه بالقشطه',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFE65100)),
+          scaffoldBackgroundColor: Colors.grey[50],
+          useMaterial3: true,
+          fontFamily: 'Cairo',
+        ),
+        home: const MainScreen(),
       ),
-      home: const MainScreen(),
     );
   }
 }
