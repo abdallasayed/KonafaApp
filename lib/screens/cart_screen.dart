@@ -1,9 +1,115 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../providers/cart_provider.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
+  bool _isLoading = false;
+
+  void _placeOrder(CartProvider cart) async {
+    // التحقق من أن العميل أدخل كل البيانات
+    if (_nameController.text.isEmpty || _phoneController.text.isEmpty || _addressController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('الرجاء إدخال جميع البيانات')));
+      return;
+    }
+
+    setState(() { _isLoading = true; });
+
+    try {
+      // تحويل المنتجات في السلة إلى قائمة لتخزينها في فايربيز
+      final itemsList = cart.items.values.map((item) => {
+        'productId': item.id,
+        'title': item.title,
+        'quantity': item.quantity,
+        'price': item.price,
+      }).toList();
+
+      // إرسال الطلب إلى فايربيز في مجموعة orders
+      await FirebaseFirestore.instance.collection('orders').add({
+        'customerName': _nameController.text,
+        'customerPhone': _phoneController.text,
+        'customerAddress': _addressController.text,
+        'totalAmount': cart.totalAmount,
+        'items': itemsList,
+        'status': 'قيد المراجعة',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      // تفريغ السلة وإغلاق النافذة
+      cart.clearCart();
+      if (!mounted) return;
+      Navigator.pop(context); 
+      
+      // إظهار رسالة النجاح
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('تم الطلب بنجاح! 🥳', style: TextStyle(color: Colors.deepOrange)),
+          content: const Text('وصلنا طلبك وسنقوم بتحضير كنافتك اللذيذة فوراً.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx), 
+              child: const Text('حسناً', style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold))
+            )
+          ],
+        )
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('حدث خطأ: $error')));
+    } finally {
+      setState(() { _isLoading = false; });
+    }
+  }
+
+  // دالة لفتح نافذة إدخال بيانات العميل
+  void _showCheckoutSheet(CartProvider cart) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true, // لتجنب تغطية الكيبورد للحقول
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(25))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom, 
+          top: 20, left: 20, right: 20
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('بيانات التوصيل', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.deepOrange)),
+            const SizedBox(height: 15),
+            TextField(controller: _nameController, decoration: const InputDecoration(labelText: 'الاسم', border: OutlineInputBorder())),
+            const SizedBox(height: 10),
+            TextField(controller: _phoneController, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'رقم الهاتف', border: OutlineInputBorder())),
+            const SizedBox(height: 10),
+            TextField(controller: _addressController, decoration: const InputDecoration(labelText: 'العنوان بالتفصيل', border: OutlineInputBorder())),
+            const SizedBox(height: 20),
+            _isLoading 
+              ? const CircularProgressIndicator(color: Colors.deepOrange)
+              : ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepOrange,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))
+                  ),
+                  onPressed: () => _placeOrder(cart),
+                  child: const Text('إرسال الطلب', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,11 +182,7 @@ class CartScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                         ),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('سيتم تفعيل تأكيد الطلب قريباً')),
-                          );
-                        },
+                        onPressed: () => _showCheckoutSheet(cart), // تم ربط الزر هنا
                         child: const Text('تأكيد الطلب', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                       )
                     ],
