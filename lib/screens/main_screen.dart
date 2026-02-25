@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/cart_provider.dart';
 import 'home_screen.dart';
 import 'cart_screen.dart';
+import 'profile_screen.dart'; // تمت إضافة الشاشة هنا
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -18,7 +19,7 @@ class _MainScreenState extends State<MainScreen> {
     const HomeScreen(),
     const Center(child: Text('شاشة العروض قريباً')),
     const CartScreen(),
-    const Center(child: Text('حسابي')),
+    const ProfileScreen(), // تم ربط الشاشة هنا
   ];
 
   @override
