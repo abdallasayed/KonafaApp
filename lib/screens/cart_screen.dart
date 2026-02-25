@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -39,7 +40,7 @@ class _CartScreenState extends State<CartScreen> {
         'customerName': _nameController.text,
         'customerPhone': _phoneController.text,
         'customerAddress': _addressController.text,
-        'totalAmount': cart.totalAmount,
+        'totalAmount': cart.totalAmount, 'userId': FirebaseAuth.instance.currentUser?.uid ?? 'guest',
         'items': itemsList,
         'status': 'قيد المراجعة',
         'createdAt': FieldValue.serverTimestamp(),

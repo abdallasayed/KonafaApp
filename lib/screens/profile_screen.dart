@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'auth_screen.dart';
+import 'orders_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -9,32 +10,18 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('حسابي', style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-      ),
-      // StreamBuilder يراقب حالة المستخدم (مسجل دخول أم لا)
+      appBar: AppBar(title: const Text('حسابي', style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold)), backgroundColor: Colors.white, elevation: 0, centerTitle: true),
       body: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: Colors.deepOrange));
-          }
-          
+          if (snapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator(color: Colors.deepOrange));
           if (snapshot.hasData) {
-            // المستخدم مسجل دخول
             final user = snapshot.data!;
             return FutureBuilder<DocumentSnapshot>(
               future: FirebaseFirestore.instance.collection('users').doc(user.uid).get(),
               builder: (context, userSnapshot) {
-                if (userSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: Colors.deepOrange));
-                }
-                
+                if (userSnapshot.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator(color: Colors.deepOrange));
                 var userData = userSnapshot.data?.data() as Map<String, dynamic>? ?? {};
-                
                 return Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
@@ -48,9 +35,7 @@ class ProfileScreen extends StatelessWidget {
                         leading: const Icon(Icons.history, color: Colors.deepOrange),
                         title: const Text('طلباتي السابقة', style: TextStyle(fontWeight: FontWeight.bold)),
                         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-                        onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('سيتم برمجتها قريباً')));
-                        },
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const OrdersScreen())),
                       ),
                       const Divider(),
                       ListTile(
@@ -64,8 +49,6 @@ class ProfileScreen extends StatelessWidget {
               }
             );
           }
-          
-          // المستخدم غير مسجل دخول (يعرض شاشة الدخول)
           return const AuthScreen();
         },
       ),

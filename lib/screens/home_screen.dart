@@ -13,33 +13,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   String selectedCategoryId = '';
 
-  void addDummyProduct() {
-    if (selectedCategoryId.isEmpty) return;
-    FirebaseFirestore.instance.collection('products').add({
-      'name': 'كنافة بالقشطة السبيشيال',
-      'description': 'أطعم كنافة بالقشطة الطازجة والمكسرات',
-      'price': 120.0,
-      'categoryId': selectedCategoryId,
-      'imageUrl': '', 
-      'isAvailable': true,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text('كنافه بالقشطه', style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold, fontSize: 24)),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: addDummyProduct,
-        backgroundColor: Colors.deepOrange,
-        child: const Icon(Icons.add_business, color: Colors.white),
-      ),
+      appBar: AppBar(backgroundColor: Colors.white, elevation: 0, title: const Text('كنافه بالقشطه', style: TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold, fontSize: 24))),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -93,12 +71,23 @@ class _HomeScreenState extends State<HomeScreen> {
                           var product = products[index].data() as Map<String, dynamic>;
                           String productId = products[index].id;
                           double price = (product['price'] ?? 0).toDouble();
+                          String imageUrl = product['imageUrl'] ?? '';
                           return Container(
                             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 5))]),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(child: Container(decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: const BorderRadius.vertical(top: Radius.circular(20))), child: Center(child: Icon(Icons.fastfood, size: 40, color: Colors.orange.shade200)))),
+                                Expanded(
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: ClipRRect(
+                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                                      child: imageUrl.isNotEmpty
+                                          ? Image.network(imageUrl, fit: BoxFit.cover, errorBuilder: (c, e, s) => Icon(Icons.broken_image, color: Colors.orange.shade200))
+                                          : Container(color: Colors.orange.shade50, child: Icon(Icons.fastfood, size: 40, color: Colors.orange.shade200)),
+                                    ),
+                                  ),
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: Column(
