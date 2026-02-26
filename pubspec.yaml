@@ -1,5 +1,5 @@
-name: konafa_admin
-description: Admin Panel for Konafa App.
+name: konafa_app
+description: Konafa Client App.
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -11,8 +11,8 @@ dependencies:
     sdk: flutter
   firebase_core: ^2.24.2
   cloud_firestore: ^4.14.0
-  image_picker: ^1.0.7
-  http: ^1.2.0
+  firebase_auth: ^4.17.4
+  provider: ^6.1.2
 
 flutter:
   uses-material-design: true
