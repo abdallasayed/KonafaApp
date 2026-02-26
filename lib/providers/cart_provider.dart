@@ -3,42 +3,34 @@ import 'package:flutter/material.dart';
 class CartItem {
   final String id;
   final String title;
+  final int quantity;
   final double price;
-  int quantity;
+  final String storeId; // المتغير الجديد لحفظ معرف المتجر
 
-  CartItem({required this.id, required this.title, required this.price, this.quantity = 1});
+  CartItem({required this.id, required this.title, required this.quantity, required this.price, required this.storeId});
 }
 
 class CartProvider with ChangeNotifier {
-  final Map<String, CartItem> _items = {};
+  Map<String, CartItem> _items = {};
 
   Map<String, CartItem> get items => _items;
   int get itemCount => _items.length;
 
   double get totalAmount {
     var total = 0.0;
-    _items.forEach((key, cartItem) {
-      total += cartItem.price * cartItem.quantity;
-    });
+    _items.forEach((key, cartItem) => total += cartItem.price * cartItem.quantity);
     return total;
   }
 
-  void addItem(String productId, String title, double price) {
+  void addItem(String productId, String title, double price, String storeId) {
     if (_items.containsKey(productId)) {
-      _items.update(
-        productId,
-        (existingItem) => CartItem(
-          id: existingItem.id,
-          title: existingItem.title,
-          price: existingItem.price,
-          quantity: existingItem.quantity + 1,
-        ),
-      );
+      _items.update(productId, (existing) => CartItem(
+        id: existing.id, title: existing.title, quantity: existing.quantity + 1, price: existing.price, storeId: existing.storeId
+      ));
     } else {
-      _items.putIfAbsent(
-        productId,
-        () => CartItem(id: productId, title: title, price: price),
-      );
+      _items.putIfAbsent(productId, () => CartItem(
+        id: DateTime.now().toString(), title: title, quantity: 1, price: price, storeId: storeId
+      ));
     }
     notifyListeners();
   }
@@ -48,8 +40,8 @@ class CartProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void clearCart() {
-    _items.clear();
+  void clear() {
+    _items = {};
     notifyListeners();
   }
 }

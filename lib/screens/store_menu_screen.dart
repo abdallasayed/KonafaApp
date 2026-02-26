@@ -118,7 +118,7 @@ class _StoreMenuScreenState extends State<StoreMenuScreen> {
                                           Text('$price ج', style: const TextStyle(color: Colors.deepOrange, fontWeight: FontWeight.bold, fontSize: 16)),
                                           GestureDetector(
                                             onTap: () {
-                                              Provider.of<CartProvider>(context, listen: false).addItem(productId, product['name'], price);
+                                              Provider.of<CartProvider>(context, listen: false).addItem(productId, product['name'], price, widget.storeId);
                                               ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تمت الإضافة للسلة: ${product['name']}'), duration: const Duration(seconds: 1)));
                                             },
                                             child: Container(padding: const EdgeInsets.all(4), decoration: BoxDecoration(color: Colors.deepOrange, borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.add, color: Colors.white, size: 20)),
